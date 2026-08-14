@@ -263,7 +263,10 @@ export default function DashboardPage() {
   };
 
   const handleBatchFetch = async (urlsToFetch?: string[]) => {
-    const urls = urlsToFetch || inputText.split("\n").map(u => u.trim()).filter(u => u.length > 0);
+    const rawList = urlsToFetch || inputText.split("\n");
+    const urls = rawList
+      .map(u => u.replace(/["'“”‘’`]/g, "").trim())
+      .filter(u => u.length > 0);
     if (urls.length === 0) return;
 
     setIsFetching(true);
@@ -652,7 +655,7 @@ export default function DashboardPage() {
           <div className="relative">
             <textarea
               value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
+              onChange={(e) => setInputText(e.target.value.replace(/["'“”‘’`]/g, ""))}
               placeholder={t.inputPlaceholder}
               rows={4}
               className="w-full bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-xs font-mono text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-rose-500/50 focus:border-rose-500 transition resize-y"
@@ -661,8 +664,8 @@ export default function DashboardPage() {
 
           <div className="flex items-center justify-between pt-1">
             <div className="text-xs text-slate-500">
-              {inputText.split("\n").filter(u => u.trim()).length > 0 ? (
-                <span>{t.readyToFetch} <strong className="text-rose-400">{inputText.split("\n").filter(u => u.trim()).length}</strong> 条链接</span>
+              {inputText.split("\n").map(u => u.replace(/["'“”‘’`]/g, "").trim()).filter(u => u.length > 0).length > 0 ? (
+                <span>{t.readyToFetch} <strong className="text-rose-400">{inputText.split("\n").map(u => u.replace(/["'“”‘’`]/g, "").trim()).filter(u => u.length > 0).length}</strong> 条链接</span>
               ) : (
                 <span>{t.clickToFetch}</span>
               )}

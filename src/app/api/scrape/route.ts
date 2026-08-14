@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "请提供有效的链接" }, { status: 400 });
     }
 
-    const rawUrl = url.trim();
+    const rawUrl = url.replace(/["'“”‘’`]/g, "").trim();
 
     // Check if it's a valid Instagram URL
     const isInstagram = rawUrl.includes("instagram.com") || rawUrl.includes("instagr.am");
