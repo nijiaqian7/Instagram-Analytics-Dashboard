@@ -774,50 +774,53 @@ export default function DashboardPage() {
                 />
               </div>
 
-              {/* Platform Filter Tabs */}
-              <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800">
-                <button
-                  onClick={() => setFilterPlatform("all")}
-                  className={`px-2.5 py-1 text-xs rounded-lg font-medium transition ${filterPlatform === "all" ? "bg-slate-800 text-white font-bold" : "text-slate-400 hover:text-white"}`}
-                >
-                  {t.filterPlatformAll}
-                </button>
-                <button
-                  onClick={() => setFilterPlatform("instagram")}
-                  className={`px-2.5 py-1 text-xs rounded-lg font-medium flex items-center space-x-1 transition ${filterPlatform === "instagram" ? "bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold" : "text-slate-400 hover:text-white"}`}
-                >
-                  <InstagramIcon className="w-3 h-3 text-rose-400" />
-                  <span>{t.filterInstagram}</span>
-                </button>
-                <button
-                  onClick={() => setFilterPlatform("tiktok")}
-                  className={`px-2.5 py-1 text-xs rounded-lg font-medium flex items-center space-x-1 transition ${filterPlatform === "tiktok" ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 font-bold" : "text-slate-400 hover:text-white"}`}
-                >
-                  <TikTokIcon className="w-3 h-3 text-cyan-400" />
-                  <span>{t.filterTikTok}</span>
-                </button>
-              </div>
+              {/* Combined Filter Group (Platform & Type stacked in 2 rows) */}
+              <div className="flex flex-col gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
+                {/* Row 1: Platform Filter */}
+                <div className="flex items-center gap-0.5">
+                  <button
+                    onClick={() => setFilterPlatform("all")}
+                    className={`px-2 py-0.5 text-[11px] rounded-md font-medium transition ${filterPlatform === "all" ? "bg-slate-800 text-white font-bold" : "text-slate-400 hover:text-white"}`}
+                  >
+                    {t.filterPlatformAll}
+                  </button>
+                  <button
+                    onClick={() => setFilterPlatform("instagram")}
+                    className={`px-2 py-0.5 text-[11px] rounded-md font-medium flex items-center space-x-1 transition ${filterPlatform === "instagram" ? "bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold" : "text-slate-400 hover:text-white"}`}
+                  >
+                    <InstagramIcon className="w-2.5 h-2.5 text-rose-400" />
+                    <span>{t.filterInstagram}</span>
+                  </button>
+                  <button
+                    onClick={() => setFilterPlatform("tiktok")}
+                    className={`px-2 py-0.5 text-[11px] rounded-md font-medium flex items-center space-x-1 transition ${filterPlatform === "tiktok" ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 font-bold" : "text-slate-400 hover:text-white"}`}
+                  >
+                    <TikTokIcon className="w-2.5 h-2.5 text-cyan-400" />
+                    <span>{t.filterTikTok}</span>
+                  </button>
+                </div>
 
-              {/* Type Filter Pills */}
-              <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800">
-                <button
-                  onClick={() => setFilterType("all")}
-                  className={`px-2.5 py-1 text-xs rounded-lg font-medium transition ${filterType === "all" ? "bg-slate-800 text-white" : "text-slate-400 hover:text-white"}`}
-                >
-                  {t.filterTypeAll}
-                </button>
-                <button
-                  onClick={() => setFilterType("post")}
-                  className={`px-2.5 py-1 text-xs rounded-lg font-medium transition ${filterType === "post" ? "bg-rose-500/20 text-rose-400 border border-rose-500/30" : "text-slate-400 hover:text-white"}`}
-                >
-                  {t.filterPosts}
-                </button>
-                <button
-                  onClick={() => setFilterType("profile")}
-                  className={`px-2.5 py-1 text-xs rounded-lg font-medium transition ${filterType === "profile" ? "bg-purple-500/20 text-purple-400 border border-purple-500/30" : "text-slate-400 hover:text-white"}`}
-                >
-                  {t.filterProfiles}
-                </button>
+                {/* Row 2: Type Filter */}
+                <div className="flex items-center gap-0.5">
+                  <button
+                    onClick={() => setFilterType("all")}
+                    className={`px-2 py-0.5 text-[11px] rounded-md font-medium transition ${filterType === "all" ? "bg-slate-800 text-white font-bold" : "text-slate-400 hover:text-white"}`}
+                  >
+                    {t.filterTypeAll}
+                  </button>
+                  <button
+                    onClick={() => setFilterType("post")}
+                    className={`px-2 py-0.5 text-[11px] rounded-md font-medium transition ${filterType === "post" ? "bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold" : "text-slate-400 hover:text-white"}`}
+                  >
+                    {t.filterPosts}
+                  </button>
+                  <button
+                    onClick={() => setFilterType("profile")}
+                    className={`px-2 py-0.5 text-[11px] rounded-md font-medium transition ${filterType === "profile" ? "bg-purple-500/20 text-purple-400 border border-purple-500/30 font-bold" : "text-slate-400 hover:text-white"}`}
+                  >
+                    {t.filterProfiles}
+                  </button>
+                </div>
               </div>
 
               <select
