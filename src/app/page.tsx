@@ -17,15 +17,15 @@ import {
   Sparkles,
   Copy,
   Check,
-  ShieldAlert,
   Globe,
   AlertCircle,
   Ban,
   FilterX,
-  Edit2
+  Edit2,
+  Share2
 } from "lucide-react";
 
-function InstagramIcon({ className = "w-6 h-6 text-white" }: { className?: string }) {
+function InstagramIcon({ className = "w-4 h-4 text-white" }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
       <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
@@ -35,11 +35,20 @@ function InstagramIcon({ className = "w-6 h-6 text-white" }: { className?: strin
   );
 }
 
+function TikTokIcon({ className = "w-4 h-4 text-cyan-400" }: { className?: string }) {
+  return (
+    <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .58.04.85.12V9.33a6.33 6.33 0 0 0-.85-.06A6.34 6.34 0 0 0 3.14 15.6a6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.28 8.28 0 0 0 4.84 1.56V6.86c-.37-.02-.73-.08-1.07-.17z" />
+    </svg>
+  );
+}
+
 type Language = "zh" | "en" | "ko";
 
 interface DataRow {
   id: string;
   url: string;
+  platform?: "instagram" | "tiktok";
   type: "post" | "profile";
   identifier: string;
   titleOrAccount: string;
@@ -50,46 +59,48 @@ interface DataRow {
 }
 
 const SAMPLE_LINKS = [
-  "https://www.instagram.com/p/C3x9L2vP1zQ/",
-  "https://www.instagram.com/p/C2a8K1mO9xL/",
-  "https://www.instagram.com/adidaskr/",
-  "https://www.tiktok.com/@sample_video"
+  "https://www.instagram.com/funday.korea.networks/",
+  "https://www.tiktok.com/@fundaykorea"
 ];
 
 const I18N = {
   zh: {
-    title: "Instagram 运营数据看板",
-    subtitle: "批量帖子点赞统计 · 主页粉丝监控 · 一键表格导出",
+    title: "SNS 运营数据看板",
+    subtitle: "Instagram · TikTok 批量点赞统计 · 主页粉丝监控 · 一键表格导出",
     teamBadge: "团队共享版",
-    connectedStatus: "已连接服务端抓取引擎",
+    connectedStatus: "已连接多平台抓取引擎",
     totalLinks: "监控总链接数",
-    postsCount: "帖子",
-    profilesCount: "主页",
+    postsCount: "帖子 / 视频",
+    profilesCount: "账号主页",
     accumulatedLikes: "已统计累计点赞",
     realtimeUpdate: "实时汇总更新",
     totalFollowers: "主页粉丝总量",
     monitoredAccounts: "已监控目标账号",
     exportCenter: "数据导出中心",
     formatExport: "导出 Excel 表格",
-    batchAddTitle: "批量添加 / 更新 Instagram 链接",
+    batchAddTitle: "批量添加 / 更新 SNS 链接",
     sampleButton: "载入示例",
-    inputDescription: "支持同时粘贴多条 Instagram 帖子链接（例如 /p/C3x9L2v...）或主页链接（例如 /nike/），每行一条。帖子点赞数将自动精准抓取；主页粉丝数支持点击填入。",
-    inputPlaceholder: "请在此粘贴链接，一行一条链接...\nhttps://www.instagram.com/p/C3x9L2vP1zQ/\nhttps://www.instagram.com/adidaskr/",
+    inputDescription: "支持同时粘贴多条 Instagram 或 TikTok 链接（支持帖子、视频、短链接及账号主页），每行一条。帖子与视频点赞数将自动精准抓取。",
+    inputPlaceholder: "请在此粘贴 Instagram 或 TikTok 链接，一行一条链接...\nhttps://www.instagram.com/funday.korea.networks/\nhttps://www.tiktok.com/@fundaykorea",
     readyToFetch: "已就绪 待抓取链接",
     clickToFetch: "粘贴链接后点击“获取数据”",
     fetchButton: "获取数据",
     fetchingStatus: "数据分析抓取中...",
-    boardTitle: "数据监控看板",
+    boardTitle: "SNS 数据监控看板",
     recordsCount: "共 {count} 项记录",
     searchPlaceholder: "搜索账号 / 标识 / 标题...",
-    filterAll: "全部",
-    filterPosts: "帖子",
-    filterProfiles: "主页",
+    filterPlatformAll: "全部平台",
+    filterInstagram: "Instagram",
+    filterTikTok: "TikTok",
+    filterTypeAll: "全部类型",
+    filterPosts: "帖子 / 视频",
+    filterProfiles: "账号主页",
     sortDefault: "默认排序",
     sortLikesDesc: "按点赞数降序 ↓",
     sortFollowersDesc: "按粉丝数降序 ↓",
-    emptyNotice: "暂无数据记录。请在上方输入 Instagram 链接并点击“获取数据”。",
+    emptyNotice: "暂无数据记录。请在上方输入 Instagram 或 TikTok 链接并点击“获取数据”。",
     colIndex: "#",
+    colPlatform: "平台",
     colType: "类型",
     colAccount: "账号 / 标识",
     colDesc: "描述与详情",
@@ -98,21 +109,34 @@ const I18N = {
     colStatus: "状态",
     colUpdated: "更新时间",
     colActions: "操作",
+    refreshAll: "刷新所有数据",
+    refreshing: "刷新中...",
     statusSuccess: "解析成功",
     statusPendingInput: "点击填入粉丝数",
-    statusInvalid: "非 Instagram 链接",
-    cleanInvalidBtn: "一键清理非 Instagram 链接 ({count})",
+    statusInvalid: "非 SNS 链接",
+    cleanInvalidBtn: "一键清理无效链接 ({count})",
     copySuccess: "链接已复制",
     confirmClear: "确定要清空看板中的所有数据吗？",
-    footerNote: "提示：帖子点赞数 100% 自动解析；主页支持点击填入精确粉丝数并导出 Excel。"
+    footerNote: "提示：Instagram 帖子点赞与 TikTok 视频点赞数 100% 自动解析；主页粉丝数支持自动获取与手动校准。",
+    excelColIndex: "序号",
+    excelColPlatform: "平台",
+    excelColType: "类型",
+    excelColAccount: "账号/标识",
+    excelColDesc: "标题或描述",
+    excelColLikes: "点赞数",
+    excelColFollowers: "粉丝数",
+    excelColStatus: "状态",
+    excelColUrl: "原始链接",
+    excelColUpdated: "更新时间",
+    footerBrand: "SNS 运营数据看板 · 团队专属工具 (ZH / EN / KO)"
   },
   en: {
-    title: "Instagram Analytics Dashboard",
-    subtitle: "Batch Post Likes · Profile Followers Monitor · One-Click Excel Export",
+    title: "SNS Analytics Dashboard",
+    subtitle: "Instagram & TikTok Batch Likes Tracking · Profile Followers Monitor · Excel Export",
     teamBadge: "Team Edition",
-    connectedStatus: "Scraper Engine Online",
+    connectedStatus: "Multi-Platform Engine Online",
     totalLinks: "Monitored Links",
-    postsCount: "Posts",
+    postsCount: "Posts / Videos",
     profilesCount: "Profiles",
     accumulatedLikes: "Total Likes",
     realtimeUpdate: "Real-time Aggregated",
@@ -120,25 +144,29 @@ const I18N = {
     monitoredAccounts: "Monitored Accounts",
     exportCenter: "Export Data",
     formatExport: "Export to Excel",
-    batchAddTitle: "Add / Update Links",
+    batchAddTitle: "Add / Update SNS Links",
     sampleButton: "Load Sample Links",
-    inputDescription: "Paste Instagram post links (e.g. /p/C3x9L2v...) or profile URLs (e.g. /nike/), one per line.",
-    inputPlaceholder: "Paste Instagram URLs here, one link per line...\nhttps://www.instagram.com/p/C3x9L2vP1zQ/\nhttps://www.instagram.com/adidaskr/",
+    inputDescription: "Paste Instagram or TikTok URLs (posts, reels, TikTok videos, short links, or profiles), one per line.",
+    inputPlaceholder: "Paste Instagram or TikTok URLs here, one link per line...\nhttps://www.instagram.com/funday.korea.networks/\nhttps://www.tiktok.com/@fundaykorea",
     readyToFetch: "Ready to process",
     clickToFetch: "Paste URLs and click 'Get Data'",
     fetchButton: "Get Data",
     fetchingStatus: "Analyzing & fetching data...",
-    boardTitle: "Analytics Dashboard",
+    boardTitle: "SNS Analytics Dashboard",
     recordsCount: "{count} Items",
     searchPlaceholder: "Search account, ID, or title...",
-    filterAll: "All",
-    filterPosts: "Posts",
+    filterPlatformAll: "All Platforms",
+    filterInstagram: "Instagram",
+    filterTikTok: "TikTok",
+    filterTypeAll: "All Types",
+    filterPosts: "Posts & Videos",
     filterProfiles: "Profiles",
     sortDefault: "Default",
     sortLikesDesc: "Likes: High to Low ↓",
     sortFollowersDesc: "Followers: High to Low ↓",
-    emptyNotice: "No data available. Paste Instagram URLs above and click 'Get Data'.",
+    emptyNotice: "No data available. Paste Instagram or TikTok URLs above and click 'Get Data'.",
     colIndex: "#",
+    colPlatform: "Platform",
     colType: "Type",
     colAccount: "Account / ID",
     colDesc: "Title & Caption",
@@ -147,47 +175,64 @@ const I18N = {
     colStatus: "Status",
     colUpdated: "Updated At",
     colActions: "Actions",
+    refreshAll: "Refresh All",
+    refreshing: "Refreshing...",
     statusSuccess: "Synced",
     statusPendingInput: "Enter Followers",
-    statusInvalid: "Invalid Link",
+    statusInvalid: "Invalid URL",
     cleanInvalidBtn: "Remove Invalid Links ({count})",
     copySuccess: "Copied Link",
     confirmClear: "Are you sure you want to clear all data?",
-    footerNote: "Note: Post likes are 100% automated; profile follower counts support manual entry and Excel export."
+    footerNote: "Note: Instagram & TikTok post/video likes are 100% automated; profile followers support auto-fetch and manual calibration.",
+    excelColIndex: "No.",
+    excelColPlatform: "Platform",
+    excelColType: "Type",
+    excelColAccount: "Account / ID",
+    excelColDesc: "Title / Caption",
+    excelColLikes: "Likes",
+    excelColFollowers: "Followers",
+    excelColStatus: "Status",
+    excelColUrl: "URL",
+    excelColUpdated: "Updated At",
+    footerBrand: "SNS Analytics Dashboard · Team Dedicated Tool (ZH / EN / KO)"
   },
   ko: {
-    title: "인스타그램 데이터 대시보드",
-    subtitle: "피드 좋아요 일괄 집계 · 팔로워 모니터링 · 엑셀 내보내기",
+    title: "SNS 데이터 대시보드",
+    subtitle: "인스타그램 · 틱톡 피드/영상 좋아요 일괄 집계 · 팔로워 모니터링 · 엑셀 내보내기",
     teamBadge: "팀 공유",
-    connectedStatus: "수집 엔진 정상 작동 중",
+    connectedStatus: "다중 플랫폼 수집 엔진 정상 가동",
     totalLinks: "모니터링 링크",
-    postsCount: "피드",
-    profilesCount: "계정",
+    postsCount: "게시물 / 영상",
+    profilesCount: "계정 프로필",
     accumulatedLikes: "누적 좋아요",
     realtimeUpdate: "실시간 집계",
     totalFollowers: "총 팔로워",
     monitoredAccounts: "모니터링 계정",
     exportCenter: "데이터 내보내기",
     formatExport: "엑셀로 내보내기",
-    batchAddTitle: "인스타그램 링크 일괄 등록",
+    batchAddTitle: "SNS 링크 일괄 등록",
     sampleButton: "샘플 링크 가져오기",
-    inputDescription: "인스타그램 게시물(/p/) 또는 프로필(/계정명/) 링크를 한 줄에 하나씩 입력해 주세요.",
-    inputPlaceholder: "인스타그램 URL을 줄바꿈하여 입력해 주세요...\nhttps://www.instagram.com/p/C3x9L2vP1zQ/\nhttps://www.instagram.com/adidaskr/",
+    inputDescription: "인스타그램 또는 틱톡 링크(게시물, 릴스, 틱톡 영상, 단축 링크, 프로필)를 한 줄에 하나씩 입력해 주세요.",
+    inputPlaceholder: "인스타그램 또는 틱톡 URL을 줄바꿈하여 입력해 주세요...\nhttps://www.instagram.com/funday.korea.networks/\nhttps://www.tiktok.com/@fundaykorea",
     readyToFetch: "수집 대기 중",
     clickToFetch: "링크 입력 후 아래 '데이터 가져오기' 버튼을 눌러주세요.",
     fetchButton: "데이터 가져오기",
     fetchingStatus: "데이터를 분석하고 있습니다...",
-    boardTitle: "데이터 모니터링",
+    boardTitle: "SNS 모니터링 대시보드",
     recordsCount: "총 {count}건",
     searchPlaceholder: "계정명, ID, 제목으로 검색하세요...",
-    filterAll: "전체",
-    filterPosts: "피드",
-    filterProfiles: "계정",
+    filterPlatformAll: "전체 플랫폼",
+    filterInstagram: "Instagram",
+    filterTikTok: "TikTok",
+    filterTypeAll: "전체 유형",
+    filterPosts: "게시물 / 영상",
+    filterProfiles: "계정 프로필",
     sortDefault: "기본순",
     sortLikesDesc: "좋아요 많은순 ↓",
     sortFollowersDesc: "팔로워 많은순 ↓",
-    emptyNotice: "등록된 데이터가 없습니다. 상단에 인스타그램 URL을 입력한 후 '데이터 가져오기'를 진행해 주세요.",
+    emptyNotice: "등록된 데이터가 없습니다. 상단에 인스타그램 또는 틱톡 URL을 입력한 후 '데이터 가져오기'를 진행해 주세요.",
     colIndex: "#",
+    colPlatform: "플랫폼",
     colType: "구분",
     colAccount: "계정 / ID",
     colDesc: "내용 / 제목",
@@ -196,13 +241,26 @@ const I18N = {
     colStatus: "상태",
     colUpdated: "최종 갱신",
     colActions: "관리",
+    refreshAll: "전체 새로고침",
+    refreshing: "새로고침 중...",
     statusSuccess: "수집 완료",
     statusPendingInput: "팔로워 입력",
     statusInvalid: "유효하지 않은 URL",
     cleanInvalidBtn: "오류 링크 정리하기 ({count})",
     copySuccess: "링크가 복사되었습니다",
     confirmClear: "모든 데이터를 삭제하시겠습니까?",
-    footerNote: "안내: 피드 좋아요는 100% 자동 수집되며, 계정 팔로워는 직접 입력 및 엑셀 내보내기를 지원합니다."
+    footerNote: "안내: 인스타그램 및 틱톡 좋아요는 100% 자동 수집되며, 계정 팔로워는 자동 수집 및 직접 수정을 지원합니다.",
+    excelColIndex: "번호",
+    excelColPlatform: "플랫폼",
+    excelColType: "구분",
+    excelColAccount: "계정 / ID",
+    excelColDesc: "제목 및 내용",
+    excelColLikes: "좋아요",
+    excelColFollowers: "팔로워",
+    excelColStatus: "상태",
+    excelColUrl: "URL 링크",
+    excelColUpdated: "갱신 시간",
+    footerBrand: "SNS 데이터 대시보드 · 팀 전용 도구 (ZH / EN / KO)"
   }
 };
 
@@ -213,6 +271,7 @@ export default function DashboardPage() {
   const [dataList, setDataList] = useState<DataRow[]>([]);
 
   const [isFetching, setIsFetching] = useState<boolean>(false);
+  const [filterPlatform, setFilterPlatform] = useState<"all" | "instagram" | "tiktok">("all");
   const [filterType, setFilterType] = useState<"all" | "post" | "profile">("all");
   const [sortBy, setSortBy] = useState<"default" | "likes-desc" | "followers-desc">("default");
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -230,7 +289,16 @@ export default function DashboardPage() {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) {
-          const cleanItems = parsed.filter((item: any) => !item.id?.startsWith("demo-"));
+          const cleanItems = parsed.map((item: any) => {
+            if (!item.platform) {
+              if (item.url?.includes("tiktok.com") || item.url?.includes("vt.tiktok.com")) {
+                item.platform = "tiktok";
+              } else if (item.url?.includes("instagram.com") || item.url?.includes("instagr.am")) {
+                item.platform = "instagram";
+              }
+            }
+            return item;
+          }).filter((item: any) => !item.id?.startsWith("demo-"));
           setDataList(cleanItems);
         }
       }
@@ -271,32 +339,44 @@ export default function DashboardPage() {
 
     setIsFetching(true);
 
+    const updateOrAppendItem = (prev: DataRow[], newItem: DataRow, targetUrl: string) => {
+      const existingIdx = prev.findIndex(p => p.url === targetUrl);
+      if (existingIdx !== -1) {
+        const updated = [...prev];
+        updated[existingIdx] = newItem;
+        return updated;
+      }
+      return [...prev, newItem];
+    };
+
     for (let i = 0; i < urls.length; i++) {
       const url = urls[i];
       const isInstagram = url.includes("instagram.com") || url.includes("instagr.am");
+      const isTikTok = url.includes("tiktok.com") || url.includes("vt.tiktok.com");
 
-      // Non-Instagram URL Check
-      if (!isInstagram) {
-        let domain = "非 Ins 域名";
+      // Non-Supported URL Check
+      if (!isInstagram && !isTikTok) {
+        let domain = "未知域名";
         try { domain = new URL(url).hostname.replace("www.", ""); } catch { /* ignore */ }
         
         const newItem: DataRow = {
           id: `invalid-${Date.now()}-${i}`,
           url,
+          platform: undefined,
           type: "post",
           identifier: domain,
-          titleOrAccount: `非 Instagram 网页 (${domain})`,
+          titleOrAccount: `非支持的 SNS 链接 (${domain})`,
           likesCount: null,
           followerCount: null,
           status: "invalid_platform",
           updatedAt: new Date().toLocaleTimeString()
         };
 
-        setDataList(prev => [newItem, ...prev.filter(p => p.url !== url)]);
+        setDataList(prev => updateOrAppendItem(prev, newItem, url));
         continue;
       }
 
-      // Valid Instagram URL -> Scrape
+      // Valid URL -> Fetch from Server Scraper Engine
       try {
         const res = await fetch("/api/scrape", {
           method: "POST",
@@ -310,49 +390,52 @@ export default function DashboardPage() {
           const newItem: DataRow = {
             id: `item-${Date.now()}-${i}`,
             url: data.url,
+            platform: data.platform || (isTikTok ? "tiktok" : "instagram"),
             type: data.type,
             identifier: data.identifier,
             titleOrAccount: data.titleOrAccount,
             likesCount: data.likesCount,
             followerCount: data.followerCount,
-            status: data.hasRealData ? "success" : data.type === "profile" ? "pending_input" : "success",
+            status: data.hasRealData ? "success" : data.type === "profile" ? (data.followerCount !== null ? "success" : "pending_input") : "success",
             updatedAt: data.fetchedAt || new Date().toLocaleTimeString(),
           };
 
-          setDataList(prev => [newItem, ...prev.filter(p => p.url !== url)]);
+          setDataList(prev => updateOrAppendItem(prev, newItem, url));
         } else {
-          const isPostOrReel = url.includes("/p/") || url.includes("/reel/") || url.includes("/reels/") || url.includes("/tv/");
-          const handle = url.split("instagram.com/").pop()?.split("/")[0]?.split("?")[0]?.replace("@", "") || `user_${i + 1}`;
+          const isPostOrReel = url.includes("/video/") || url.includes("/p/") || url.includes("/reel/") || url.includes("/reels/") || url.includes("/tv/");
+          const handle = (url.split("@")[1]?.split("/")[0] || url.split("/").pop())?.split("?")[0] || `user_${i + 1}`;
 
           const newItem: DataRow = {
             id: `item-${Date.now()}-${i}`,
             url,
+            platform: isTikTok ? "tiktok" : "instagram",
             type: isPostOrReel ? "post" : "profile",
             identifier: `@${handle}`,
-            titleOrAccount: `@${handle} Instagram`,
+            titleOrAccount: `@${handle} ${isTikTok ? "TikTok" : "Instagram"}`,
             likesCount: null,
             followerCount: null,
             status: isPostOrReel ? "success" : "pending_input",
             updatedAt: new Date().toLocaleTimeString()
           };
-          setDataList(prev => [newItem, ...prev.filter(p => p.url !== url)]);
+          setDataList(prev => updateOrAppendItem(prev, newItem, url));
         }
       } catch {
-        const isPostOrReel = url.includes("/p/") || url.includes("/reel/") || url.includes("/reels/") || url.includes("/tv/");
-        const handle = url.split("instagram.com/").pop()?.split("/")[0]?.split("?")[0]?.replace("@", "") || `user_${i + 1}`;
+        const isPostOrReel = url.includes("/video/") || url.includes("/p/") || url.includes("/reel/") || url.includes("/reels/") || url.includes("/tv/");
+        const handle = (url.split("@")[1]?.split("/")[0] || url.split("/").pop())?.split("?")[0] || `user_${i + 1}`;
 
         const newItem: DataRow = {
           id: `item-${Date.now()}-${i}`,
           url,
+          platform: isTikTok ? "tiktok" : "instagram",
           type: isPostOrReel ? "post" : "profile",
           identifier: `@${handle}`,
-          titleOrAccount: `@${handle} Instagram`,
+          titleOrAccount: `@${handle} ${isTikTok ? "TikTok" : "Instagram"}`,
           likesCount: null,
           followerCount: null,
           status: isPostOrReel ? "success" : "pending_input",
           updatedAt: new Date().toLocaleTimeString()
         };
-        setDataList(prev => [newItem, ...prev.filter(p => p.url !== url)]);
+        setDataList(prev => updateOrAppendItem(prev, newItem, url));
       }
     }
 
@@ -421,57 +504,41 @@ export default function DashboardPage() {
     if (dataList.length === 0) return;
 
     const exportData = filteredData.map((item, idx) => ({
-      "序号": idx + 1,
-      "类型": item.type === "post" ? t.postsCount : t.profilesCount,
-      "账号/标识": item.identifier,
-      "标题或描述": item.titleOrAccount,
-      "点赞数": item.likesCount ?? "N/A",
-      "粉丝数": item.followerCount ?? "未填",
-      "状态": item.status === "success" ? t.statusSuccess : item.status === "invalid_platform" ? t.statusInvalid : t.statusPendingInput,
-      "Instagram 链接": item.url,
-      "更新时间": item.updatedAt
+      [t.excelColIndex]: idx + 1,
+      [t.excelColPlatform]: item.platform === "tiktok" ? "TikTok" : item.platform === "instagram" ? "Instagram" : "Other",
+      [t.excelColType]: item.type === "post" ? t.postsCount : t.profilesCount,
+      [t.excelColAccount]: item.identifier,
+      [t.excelColDesc]: item.titleOrAccount,
+      [t.excelColLikes]: item.type === "post" ? (item.likesCount !== null ? item.likesCount : "") : "",
+      [t.excelColFollowers]: item.type === "profile" ? (item.followerCount !== null ? item.followerCount : "") : "",
+      [t.excelColStatus]: item.status === "success" ? t.statusSuccess : item.status === "invalid_platform" ? t.statusInvalid : t.statusPendingInput,
+      [t.excelColUrl]: item.url,
+      [t.excelColUpdated]: item.updatedAt
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "InstagramData");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "SNS_Data");
     
-    const fileName = `Instagram_Analytics_${lang.toUpperCase()}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+    const fileName = `SNS_Analytics_${lang.toUpperCase()}_${new Date().toISOString().slice(0, 10)}.xlsx`;
     XLSX.writeFile(workbook, fileName);
-  };
-
-  const handleExportCSV = () => {
-    if (dataList.length === 0) return;
-
-    const headers = [`${t.colIndex},${t.colType},${t.colAccount},${t.colDesc},${t.colLikes},${t.colFollowers},${t.colStatus},Instagram链接,${t.colUpdated}`];
-    const rows = filteredData.map((item, idx) => [
-      idx + 1,
-      item.type === "post" ? t.postsCount : t.profilesCount,
-      `"${item.identifier}"`,
-      `"${item.titleOrAccount.replace(/"/g, '""')}"`,
-      item.likesCount ?? "",
-      item.followerCount ?? "",
-      item.status,
-      `"${item.url}"`,
-      item.updatedAt
-    ].join(","));
-
-    const csvContent = "\uFEFF" + [headers, ...rows].join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `Instagram_Analytics_${lang.toUpperCase()}_${new Date().toISOString().slice(0, 10)}.csv`;
-    link.click();
   };
 
   const filteredData = dataList
     .filter(item => {
+      // Platform filter
+      if (filterPlatform === "instagram") return item.platform === "instagram";
+      if (filterPlatform === "tiktok") return item.platform === "tiktok";
+      return true;
+    })
+    .filter(item => {
+      // Type filter
       if (filterType === "post") return item.type === "post";
       if (filterType === "profile") return item.type === "profile";
       return true;
     })
     .filter(item => {
+      // Search query
       if (!searchQuery.trim()) return true;
       const q = searchQuery.toLowerCase();
       return (
@@ -501,7 +568,7 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center">
         <div className="flex items-center space-x-2 text-slate-400">
           <RefreshCw className="w-5 h-5 animate-spin" />
-          <span>Loading Instagram Dashboard...</span>
+          <span>Loading SNS Dashboard...</span>
         </div>
       </div>
     );
@@ -513,14 +580,17 @@ export default function DashboardPage() {
       <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 rounded-xl shadow-lg shadow-rose-500/20">
-              <InstagramIcon className="w-6 h-6 text-white" />
+            <div className="p-2 bg-gradient-to-tr from-rose-500 via-purple-600 to-cyan-500 rounded-xl shadow-lg shadow-purple-500/20 flex items-center space-x-1">
+              <Share2 className="w-6 h-6 text-white" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
                 <h1 className="font-bold text-lg tracking-tight text-white">{t.title}</h1>
                 <span className="text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20">
                   {t.teamBadge}
+                </span>
+                <span className="text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                  IG + TikTok
                 </span>
               </div>
               <p className="text-xs text-slate-400">{t.subtitle}</p>
@@ -565,7 +635,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800/80 shadow-sm relative overflow-hidden group hover:border-slate-700 transition">
             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
-              <InstagramIcon className="w-16 h-16 text-rose-500" />
+              <Share2 className="w-16 h-16 text-rose-500" />
             </div>
             <p className="text-xs font-medium text-slate-400">{t.totalLinks}</p>
             <div className="mt-2 flex items-baseline space-x-2">
@@ -611,23 +681,14 @@ export default function DashboardPage() {
             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
               <FileSpreadsheet className="w-16 h-16 text-emerald-500" />
             </div>
-            <p className="text-xs font-medium text-slate-400">{t.exportCenter}</p>
-            <div className="mt-3 flex items-center space-x-2">
+            <div className="mt-3">
               <button
                 onClick={handleExportExcel}
                 disabled={dataList.length === 0}
-                className="flex-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center justify-center space-x-1 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center justify-center space-x-1.5 transition shadow-md shadow-emerald-600/20 disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                <FileSpreadsheet className="w-3.5 h-3.5" />
-                <span>Excel</span>
-              </button>
-              <button
-                onClick={handleExportCSV}
-                disabled={dataList.length === 0}
-                className="flex-1 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center justify-center space-x-1 transition disabled:opacity-40 disabled:cursor-not-allowed border border-slate-700"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>CSV</span>
+                <FileSpreadsheet className="w-4 h-4" />
+                <span>{t.formatExport}</span>
               </button>
             </div>
             <p className="mt-2 text-[10px] text-slate-500 text-center">{t.formatExport}</p>
@@ -674,7 +735,7 @@ export default function DashboardPage() {
             <button
               onClick={() => handleBatchFetch()}
               disabled={isFetching || inputText.trim().length === 0}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-purple-600 hover:from-rose-500 hover:to-purple-500 text-white text-xs font-semibold flex items-center space-x-2 shadow-lg shadow-rose-600/25 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 via-purple-600 to-cyan-600 hover:opacity-90 text-white text-xs font-semibold flex items-center space-x-2 shadow-lg shadow-rose-600/25 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isFetching ? (
                 <>
@@ -683,7 +744,7 @@ export default function DashboardPage() {
                 </>
               ) : (
                 <>
-                  <InstagramIcon className="w-4 h-4 text-white" />
+                  <Sparkles className="w-4 h-4 text-white" />
                   <span>{t.fetchButton}</span>
                 </>
               )}
@@ -697,13 +758,11 @@ export default function DashboardPage() {
           <div className="p-5 border-b border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center space-x-4">
               <h2 className="font-semibold text-base text-white">{t.boardTitle}</h2>
-              <span className="text-xs bg-slate-800 text-slate-400 px-2.5 py-1 rounded-lg">
-                {t.recordsCount.replace("{count}", filteredData.length.toString())}
-              </span>
             </div>
 
             {/* Filters & Sorting & Purge Buttons */}
             <div className="flex flex-wrap items-center gap-3">
+              {/* Search Bar */}
               <div className="relative">
                 <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
@@ -715,22 +774,47 @@ export default function DashboardPage() {
                 />
               </div>
 
+              {/* Platform Filter Tabs */}
+              <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800">
+                <button
+                  onClick={() => setFilterPlatform("all")}
+                  className={`px-2.5 py-1 text-xs rounded-lg font-medium transition ${filterPlatform === "all" ? "bg-slate-800 text-white font-bold" : "text-slate-400 hover:text-white"}`}
+                >
+                  {t.filterPlatformAll}
+                </button>
+                <button
+                  onClick={() => setFilterPlatform("instagram")}
+                  className={`px-2.5 py-1 text-xs rounded-lg font-medium flex items-center space-x-1 transition ${filterPlatform === "instagram" ? "bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold" : "text-slate-400 hover:text-white"}`}
+                >
+                  <InstagramIcon className="w-3 h-3 text-rose-400" />
+                  <span>{t.filterInstagram}</span>
+                </button>
+                <button
+                  onClick={() => setFilterPlatform("tiktok")}
+                  className={`px-2.5 py-1 text-xs rounded-lg font-medium flex items-center space-x-1 transition ${filterPlatform === "tiktok" ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 font-bold" : "text-slate-400 hover:text-white"}`}
+                >
+                  <TikTokIcon className="w-3 h-3 text-cyan-400" />
+                  <span>{t.filterTikTok}</span>
+                </button>
+              </div>
+
+              {/* Type Filter Pills */}
               <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800">
                 <button
                   onClick={() => setFilterType("all")}
-                  className={`px-3 py-1 text-xs rounded-lg font-medium transition ${filterType === "all" ? "bg-slate-800 text-white" : "text-slate-400 hover:text-white"}`}
+                  className={`px-2.5 py-1 text-xs rounded-lg font-medium transition ${filterType === "all" ? "bg-slate-800 text-white" : "text-slate-400 hover:text-white"}`}
                 >
-                  {t.filterAll}
+                  {t.filterTypeAll}
                 </button>
                 <button
                   onClick={() => setFilterType("post")}
-                  className={`px-3 py-1 text-xs rounded-lg font-medium transition ${filterType === "post" ? "bg-rose-500/20 text-rose-400 border border-rose-500/30" : "text-slate-400 hover:text-white"}`}
+                  className={`px-2.5 py-1 text-xs rounded-lg font-medium transition ${filterType === "post" ? "bg-rose-500/20 text-rose-400 border border-rose-500/30" : "text-slate-400 hover:text-white"}`}
                 >
                   {t.filterPosts}
                 </button>
                 <button
                   onClick={() => setFilterType("profile")}
-                  className={`px-3 py-1 text-xs rounded-lg font-medium transition ${filterType === "profile" ? "bg-purple-500/20 text-purple-400 border border-purple-500/30" : "text-slate-400 hover:text-white"}`}
+                  className={`px-2.5 py-1 text-xs rounded-lg font-medium transition ${filterType === "profile" ? "bg-purple-500/20 text-purple-400 border border-purple-500/30" : "text-slate-400 hover:text-white"}`}
                 >
                   {t.filterProfiles}
                 </button>
@@ -751,7 +835,7 @@ export default function DashboardPage() {
                 <button
                   onClick={handleClearInvalid}
                   className="px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition animate-pulse"
-                  title="Remove Non-Instagram Links"
+                  title="Remove Invalid Links"
                 >
                   <FilterX className="w-3.5 h-3.5" />
                   <span>{t.cleanInvalidBtn.replace("{count}", invalidCount.toString())}</span>
@@ -763,10 +847,10 @@ export default function DashboardPage() {
                   onClick={handleRefreshAll}
                   disabled={isFetching}
                   className="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                  title="刷新所有数据"
+                  title={t.refreshAll}
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? "animate-spin" : ""}`} />
-                  <span>{isFetching ? "刷新中..." : "刷新所有数据"}</span>
+                  <span>{isFetching ? t.refreshing : t.refreshAll}</span>
                 </button>
               )}
 
@@ -788,6 +872,7 @@ export default function DashboardPage() {
               <thead>
                 <tr className="border-b border-slate-800 bg-slate-950/50 text-slate-400 font-semibold uppercase tracking-wider">
                   <th className="py-3.5 px-4 w-12 text-center">{t.colIndex}</th>
+                  <th className="py-3.5 px-4">{t.colPlatform}</th>
                   <th className="py-3.5 px-4">{t.colType}</th>
                   <th className="py-3.5 px-4">{t.colAccount}</th>
                   <th className="py-3.5 px-4">{t.colDesc}</th>
@@ -809,9 +894,9 @@ export default function DashboardPage() {
               <tbody className="divide-y divide-slate-800/60">
                 {filteredData.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="py-12 text-center text-slate-500">
+                    <td colSpan={10} className="py-12 text-center text-slate-500">
                       <div className="flex flex-col items-center justify-center space-y-2">
-                        <InstagramIcon className="w-8 h-8 text-slate-700" />
+                        <Share2 className="w-8 h-8 text-slate-700" />
                         <p>{t.emptyNotice}</p>
                       </div>
                     </td>
@@ -826,11 +911,27 @@ export default function DashboardPage() {
                         {index + 1}
                       </td>
 
+                      {/* Platform Column */}
                       <td className="py-3.5 px-4">
                         {item.status === "invalid_platform" ? (
                           <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                            <Ban className="w-3 h-3 mr-1" /> 未知平台
+                            <Ban className="w-3 h-3 mr-1" /> 未知
                           </span>
+                        ) : item.platform === "tiktok" ? (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                            <TikTokIcon className="w-3 h-3 mr-1 text-cyan-400" /> TikTok
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                            <InstagramIcon className="w-3 h-3 mr-1 text-rose-400" /> Instagram
+                          </span>
+                        )}
+                      </td>
+
+                      {/* Type Column */}
+                      <td className="py-3.5 px-4">
+                        {item.status === "invalid_platform" ? (
+                          <span className="text-slate-500">-</span>
                         ) : item.type === "post" ? (
                           <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20">
                             <Heart className="w-3 h-3 mr-1 text-rose-400 fill-rose-400/20" /> {t.postsCount}
@@ -846,7 +947,7 @@ export default function DashboardPage() {
                         {item.identifier}
                       </td>
 
-                      <td className="py-3.5 px-4 text-slate-300 max-w-xs truncate">
+                      <td className="py-3.5 px-4 text-slate-300 max-w-xs truncate" title={item.titleOrAccount}>
                         {item.titleOrAccount}
                       </td>
 
@@ -945,9 +1046,9 @@ export default function DashboardPage() {
                           target="_blank"
                           rel="noreferrer"
                           className="inline-block p-1 text-slate-400 hover:text-white rounded transition"
-                          title="Open Link in Instagram"
+                          title="Open Link"
                         >
-                          <ExternalLink className="w-3.5 h-3.5 text-purple-400 hover:text-purple-300" />
+                          <ExternalLink className="w-3.5 h-3.5 text-cyan-400 hover:text-cyan-300" />
                         </a>
                         <button
                           onClick={() => handleDeleteRow(item.id)}
@@ -967,14 +1068,14 @@ export default function DashboardPage() {
           <div className="p-4 bg-slate-950/60 border-t border-slate-800 flex items-center justify-between text-xs text-slate-500">
             <div>{t.footerNote}</div>
             <div className="flex items-center space-x-4">
-              <span>Instagram Analytics Engine v1.6</span>
+              <span>SNS Analytics Engine v2.0 (IG + TikTok)</span>
             </div>
           </div>
         </section>
       </main>
 
       <footer className="border-t border-slate-800 py-6 mt-12 text-center text-xs text-slate-600">
-        <p>Instagram Analytics Dashboard · Team Dedicated Tool (ZH / EN / KO)</p>
+        <p>{t.footerBrand}</p>
       </footer>
     </div>
   );
