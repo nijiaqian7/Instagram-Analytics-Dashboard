@@ -83,6 +83,7 @@ const I18N = {
     inputDescription: "支持同时粘贴多条 Instagram 或 TikTok 链接（支持帖子、视频、短链接及账号主页），每行一条。帖子与视频点赞数将自动精准抓取。",
     inputPlaceholder: "请在此粘贴 Instagram 或 TikTok 链接，一行一条链接...\nhttps://www.instagram.com/funday.korea.networks/\nhttps://www.tiktok.com/@fundaykorea",
     readyToFetch: "已就绪 待抓取链接",
+    readyCount: "已就绪 {count} 条待抓取链接",
     clickToFetch: "粘贴链接后点击“获取数据”",
     fetchButton: "获取数据",
     fetchingStatus: "数据分析抓取中...",
@@ -128,7 +129,17 @@ const I18N = {
     excelColStatus: "状态",
     excelColUrl: "原始链接",
     excelColUpdated: "更新时间",
-    footerBrand: "SNS 运营数据看板 · 团队专属工具 (ZH / EN / KO)"
+    footerBrand: "SNS 运营数据看板 · 团队专属工具 (ZH / EN / KO)",
+    invalidUrlDesc: "非支持的 SNS 链接 ({domain})",
+    unknownDomain: "未知域名",
+    unknownPlatform: "未知",
+    numberPlaceholder: "数字",
+    enterFollowersBtn: "填入真实数字",
+    editFollowersTooltip: "修改粉丝数",
+    clearAllTooltip: "清空全部数据",
+    copyTooltip: "复制链接",
+    openLinkTooltip: "打开原链接",
+    deleteTooltip: "删除此记录",
   },
   en: {
     title: "SNS Analytics Dashboard",
@@ -149,6 +160,7 @@ const I18N = {
     inputDescription: "Paste Instagram or TikTok URLs (posts, reels, TikTok videos, short links, or profiles), one per line.",
     inputPlaceholder: "Paste Instagram or TikTok URLs here, one link per line...\nhttps://www.instagram.com/funday.korea.networks/\nhttps://www.tiktok.com/@fundaykorea",
     readyToFetch: "Ready to process",
+    readyCount: "{count} links ready to fetch",
     clickToFetch: "Paste URLs and click 'Get Data'",
     fetchButton: "Get Data",
     fetchingStatus: "Analyzing & fetching data...",
@@ -194,7 +206,17 @@ const I18N = {
     excelColStatus: "Status",
     excelColUrl: "URL",
     excelColUpdated: "Updated At",
-    footerBrand: "SNS Analytics Dashboard · Team Dedicated Tool (ZH / EN / KO)"
+    footerBrand: "SNS Analytics Dashboard · Team Dedicated Tool (ZH / EN / KO)",
+    invalidUrlDesc: "Unsupported SNS Link ({domain})",
+    unknownDomain: "Unknown Domain",
+    unknownPlatform: "Unknown",
+    numberPlaceholder: "Number",
+    enterFollowersBtn: "Enter Followers",
+    editFollowersTooltip: "Edit followers",
+    clearAllTooltip: "Clear all data",
+    copyTooltip: "Copy link",
+    openLinkTooltip: "Open original link",
+    deleteTooltip: "Delete record",
   },
   ko: {
     title: "SNS 데이터 대시보드",
@@ -215,6 +237,7 @@ const I18N = {
     inputDescription: "인스타그램 또는 틱톡 링크(게시물, 릴스, 틱톡 영상, 단축 링크, 프로필)를 한 줄에 하나씩 입력해 주세요.",
     inputPlaceholder: "인스타그램 또는 틱톡 URL을 줄바꿈하여 입력해 주세요...\nhttps://www.instagram.com/funday.korea.networks/\nhttps://www.tiktok.com/@fundaykorea",
     readyToFetch: "수집 대기 중",
+    readyCount: "{count}개 링크 수집 대기 중",
     clickToFetch: "링크 입력 후 아래 '데이터 가져오기' 버튼을 눌러주세요.",
     fetchButton: "데이터 가져오기",
     fetchingStatus: "데이터를 분석하고 있습니다...",
@@ -260,7 +283,17 @@ const I18N = {
     excelColStatus: "상태",
     excelColUrl: "URL 링크",
     excelColUpdated: "갱신 시간",
-    footerBrand: "SNS 데이터 대시보드 · 팀 전용 도구 (ZH / EN / KO)"
+    footerBrand: "SNS 데이터 대시보드 · 팀 전용 도구 (ZH / EN / KO)",
+    invalidUrlDesc: "지원하지 않는 SNS 링크 ({domain})",
+    unknownDomain: "알 수 없는 도메인",
+    unknownPlatform: "알 수 없음",
+    numberPlaceholder: "숫자",
+    enterFollowersBtn: "팔로워 직접 입력",
+    editFollowersTooltip: "팔로워 수정",
+    clearAllTooltip: "전체 데이터 삭제",
+    copyTooltip: "링크 복사",
+    openLinkTooltip: "원본 링크 열기",
+    deleteTooltip: "기록 삭제",
   }
 };
 
@@ -356,7 +389,7 @@ export default function DashboardPage() {
 
       // Non-Supported URL Check
       if (!isInstagram && !isTikTok) {
-        let domain = "未知域名";
+        let domain = t.unknownDomain;
         try { domain = new URL(url).hostname.replace("www.", ""); } catch { /* ignore */ }
         
         const newItem: DataRow = {
@@ -365,7 +398,7 @@ export default function DashboardPage() {
           platform: undefined,
           type: "post",
           identifier: domain,
-          titleOrAccount: `非支持的 SNS 链接 (${domain})`,
+          titleOrAccount: t.invalidUrlDesc.replace("{domain}", domain),
           likesCount: null,
           followerCount: null,
           status: "invalid_platform",
@@ -505,10 +538,10 @@ export default function DashboardPage() {
 
     const exportData = filteredData.map((item, idx) => ({
       [t.excelColIndex]: idx + 1,
-      [t.excelColPlatform]: item.platform === "tiktok" ? "TikTok" : item.platform === "instagram" ? "Instagram" : "Other",
+      [t.excelColPlatform]: item.platform === "tiktok" ? "TikTok" : item.platform === "instagram" ? "Instagram" : t.unknownPlatform,
       [t.excelColType]: item.type === "post" ? t.postsCount : t.profilesCount,
       [t.excelColAccount]: item.identifier,
-      [t.excelColDesc]: item.titleOrAccount,
+      [t.excelColDesc]: item.status === "invalid_platform" ? t.invalidUrlDesc.replace("{domain}", item.identifier) : item.titleOrAccount,
       [t.excelColLikes]: item.type === "post" ? (item.likesCount !== null ? item.likesCount : "") : "",
       [t.excelColFollowers]: item.type === "profile" ? (item.followerCount !== null ? item.followerCount : "") : "",
       [t.excelColStatus]: item.status === "success" ? t.statusSuccess : item.status === "invalid_platform" ? t.statusInvalid : t.statusPendingInput,
@@ -726,7 +759,9 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between pt-1">
             <div className="text-xs text-slate-500">
               {inputText.split("\n").map(u => u.replace(/["'“”‘’`]/g, "").trim()).filter(u => u.length > 0).length > 0 ? (
-                <span>{t.readyToFetch} <strong className="text-rose-400">{inputText.split("\n").map(u => u.replace(/["'“”‘’`]/g, "").trim()).filter(u => u.length > 0).length}</strong> 条链接</span>
+                <span>
+                  {t.readyCount.replace("{count}", inputText.split("\n").map(u => u.replace(/["'“”‘’`]/g, "").trim()).filter(u => u.length > 0).length.toString())}
+                </span>
               ) : (
                 <span>{t.clickToFetch}</span>
               )}
@@ -861,7 +896,7 @@ export default function DashboardPage() {
                 <button
                   onClick={handleClearAll}
                   className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition"
-                  title="Clear All"
+                  title={t.clearAllTooltip}
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -873,12 +908,12 @@ export default function DashboardPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b border-slate-800 bg-slate-950/50 text-slate-400 font-semibold uppercase tracking-wider">
+                <tr className="border-b border-slate-800 bg-slate-950/50 text-slate-400 font-semibold uppercase tracking-wider whitespace-nowrap">
                   <th className="py-3.5 px-4 w-12 text-center">{t.colIndex}</th>
                   <th className="py-3.5 px-4">{t.colPlatform}</th>
                   <th className="py-3.5 px-4">{t.colType}</th>
                   <th className="py-3.5 px-4">{t.colAccount}</th>
-                  <th className="py-3.5 px-4">{t.colDesc}</th>
+                  <th className="py-3.5 px-4 max-w-[220px]">{t.colDesc}</th>
                   <th className="py-3.5 px-4 text-right">
                     <span className="inline-flex items-center gap-1 justify-end">
                       <Heart className="w-3.5 h-3.5 text-rose-500" /> {t.colLikes}
@@ -910,15 +945,15 @@ export default function DashboardPage() {
                       key={item.id}
                       className={`hover:bg-slate-800/40 transition group ${item.status === "invalid_platform" ? "bg-amber-950/10 border-l-2 border-amber-500/50" : ""}`}
                     >
-                      <td className="py-3.5 px-4 text-center text-slate-500 font-mono">
+                      <td className="py-3.5 px-4 text-center text-slate-500 font-mono whitespace-nowrap">
                         {index + 1}
                       </td>
 
                       {/* Platform Column */}
-                      <td className="py-3.5 px-4">
+                      <td className="py-3.5 px-4 whitespace-nowrap">
                         {item.status === "invalid_platform" ? (
                           <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                            <Ban className="w-3 h-3 mr-1" /> 未知
+                            <Ban className="w-3 h-3 mr-1" /> {t.unknownPlatform}
                           </span>
                         ) : item.platform === "tiktok" ? (
                           <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
@@ -932,7 +967,7 @@ export default function DashboardPage() {
                       </td>
 
                       {/* Type Column */}
-                      <td className="py-3.5 px-4">
+                      <td className="py-3.5 px-4 whitespace-nowrap">
                         {item.status === "invalid_platform" ? (
                           <span className="text-slate-500">-</span>
                         ) : item.type === "post" ? (
@@ -946,15 +981,22 @@ export default function DashboardPage() {
                         )}
                       </td>
 
-                      <td className="py-3.5 px-4 font-semibold text-slate-200">
+                      <td className="py-3.5 px-4 font-semibold text-slate-200 whitespace-nowrap max-w-[140px] truncate" title={item.identifier}>
                         {item.identifier}
                       </td>
 
-                      <td className="py-3.5 px-4 text-slate-300 max-w-xs truncate" title={item.titleOrAccount}>
-                        {item.titleOrAccount}
+                      {/* Description / Details Column with fixed max-width and tooltip on hover */}
+                      <td
+                        className="py-3.5 px-4 text-slate-300 max-w-[220px] whitespace-nowrap"
+                        title={item.status === "invalid_platform" ? t.invalidUrlDesc.replace("{domain}", item.identifier) : item.titleOrAccount}
+                      >
+                        <span className="block truncate cursor-default">
+                          {item.status === "invalid_platform" ? t.invalidUrlDesc.replace("{domain}", item.identifier) : item.titleOrAccount}
+                        </span>
                       </td>
 
-                      <td className="py-3.5 px-4 text-right font-mono font-bold text-rose-400 text-sm">
+                      {/* Likes Column (No Wrap) */}
+                      <td className="py-3.5 px-4 text-right font-mono font-bold text-rose-400 text-sm whitespace-nowrap">
                         {item.likesCount !== null ? (
                           item.likesCount.toLocaleString()
                         ) : (
@@ -962,14 +1004,15 @@ export default function DashboardPage() {
                         )}
                       </td>
 
-                      <td className="py-3.5 px-4 text-right font-mono font-bold text-purple-400 text-sm">
+                      {/* Followers Column (No Wrap) */}
+                      <td className="py-3.5 px-4 text-right font-mono font-bold text-purple-400 text-sm whitespace-nowrap">
                         {editingId === item.id ? (
                           <div className="flex items-center justify-end space-x-1">
                             <input
                               type="number"
                               value={editingValue}
                               onChange={(e) => setEditingValue(e.target.value)}
-                              placeholder="数字"
+                              placeholder={t.numberPlaceholder}
                               autoFocus
                               className="w-24 bg-slate-950 border border-purple-500 text-purple-300 text-xs px-2 py-1 rounded text-right focus:outline-none"
                               onKeyDown={(e) => {
@@ -985,12 +1028,12 @@ export default function DashboardPage() {
                             </button>
                           </div>
                         ) : item.followerCount !== null ? (
-                          <div className="inline-flex items-center space-x-1.5 group/edit">
+                          <div className="inline-flex items-center space-x-1.5 group/edit whitespace-nowrap">
                             <span>{item.followerCount.toLocaleString()}</span>
                             <button
                               onClick={() => handleStartEditFollower(item.id, item.followerCount)}
                               className="opacity-0 group-hover/edit:opacity-100 p-0.5 text-slate-500 hover:text-purple-300 transition"
-                              title="修改粉丝数"
+                              title={t.editFollowersTooltip}
                             >
                               <Edit2 className="w-3 h-3" />
                             </button>
@@ -1000,16 +1043,16 @@ export default function DashboardPage() {
                         ) : (
                           <button
                             onClick={() => handleStartEditFollower(item.id, null)}
-                            className="inline-flex items-center space-x-1 text-purple-400 hover:text-purple-300 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 px-2 py-0.5 rounded text-[11px] font-medium transition"
+                            className="inline-flex items-center space-x-1 text-purple-400 hover:text-purple-300 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 px-2 py-0.5 rounded text-[11px] font-medium transition whitespace-nowrap"
                           >
                             <Edit2 className="w-3 h-3" />
-                            <span>填入真实数字</span>
+                            <span>{t.enterFollowersBtn}</span>
                           </button>
                         )}
 
                       </td>
 
-                      <td className="py-3.5 px-4 text-center">
+                      <td className="py-3.5 px-4 text-center whitespace-nowrap">
                         {item.status === "invalid_platform" ? (
                           <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
                             <AlertCircle className="w-3 h-3 mr-1 text-amber-400" /> {t.statusInvalid}
@@ -1021,22 +1064,22 @@ export default function DashboardPage() {
                         ) : (
                           <button
                             onClick={() => handleStartEditFollower(item.id, item.followerCount)}
-                            className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20 hover:bg-purple-500/20 transition cursor-pointer"
+                            className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20 hover:bg-purple-500/20 transition cursor-pointer whitespace-nowrap"
                           >
                             <Edit2 className="w-3 h-3 mr-1" /> {t.statusPendingInput}
                           </button>
                         )}
                       </td>
 
-                      <td className="py-3.5 px-4 text-slate-500 font-mono text-[11px]">
+                      <td className="py-3.5 px-4 text-slate-500 font-mono text-[11px] whitespace-nowrap">
                         {item.updatedAt}
                       </td>
 
-                      <td className="py-3.5 px-4 text-right space-x-2">
+                      <td className="py-3.5 px-4 text-right space-x-2 whitespace-nowrap">
                         <button
                           onClick={() => handleCopy(item.url, item.id)}
                           className="p-1 text-slate-400 hover:text-white rounded transition"
-                          title="Copy link"
+                          title={t.copyTooltip}
                         >
                           {copiedId === item.id ? (
                             <Check className="w-3.5 h-3.5 text-emerald-400" />
@@ -1049,14 +1092,14 @@ export default function DashboardPage() {
                           target="_blank"
                           rel="noreferrer"
                           className="inline-block p-1 text-slate-400 hover:text-white rounded transition"
-                          title="Open Link"
+                          title={t.openLinkTooltip}
                         >
                           <ExternalLink className="w-3.5 h-3.5 text-cyan-400 hover:text-cyan-300" />
                         </a>
                         <button
                           onClick={() => handleDeleteRow(item.id)}
                           className="p-1 text-slate-500 hover:text-rose-400 rounded transition"
-                          title="Delete"
+                          title={t.deleteTooltip}
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>

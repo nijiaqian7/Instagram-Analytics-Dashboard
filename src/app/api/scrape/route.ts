@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
                 const videoDetail = defaultScope?.["webapp.video-detail"]?.itemInfo?.itemStruct;
                 if (videoDetail) {
                   identifier = `@${videoDetail.author?.uniqueId || ""}`;
-                  titleOrAccount = videoDetail.desc || `${identifier} 的 TikTok 视频`;
+                  titleOrAccount = videoDetail.desc || `${identifier} (TikTok Video)`;
                   likesCount = videoDetail.stats?.diggCount ?? null;
                 }
               }
@@ -161,7 +161,7 @@ export async function POST(req: NextRequest) {
             if (handle) identifier = `@${handle}`;
           }
           if (!titleOrAccount) {
-            titleOrAccount = isProfile ? `${identifier} TikTok 主页` : `TikTok 视频 (${identifier})`;
+            titleOrAccount = isProfile ? `${identifier} (TikTok)` : `TikTok Video (${identifier})`;
           }
         }
       } catch (err: any) {
@@ -180,7 +180,7 @@ export async function POST(req: NextRequest) {
         url: rawUrl,
         type: isProfile ? "profile" : "post",
         identifier: identifier || "@tiktok_user",
-        titleOrAccount: titleOrAccount || (isProfile ? "TikTok 创作者主页" : "TikTok 视频"),
+        titleOrAccount: titleOrAccount || (isProfile ? `${identifier || "@user"} (TikTok)` : "TikTok Video"),
         likesCount,
         followerCount,
         fetchedAt: new Date().toLocaleTimeString(),
@@ -282,7 +282,7 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      if (!titleOrAccount) titleOrAccount = `@${username} 官方主页`;
+      if (!titleOrAccount) titleOrAccount = `@${username} (Instagram)`;
       likesCount = null; // Profile MUST NOT have likes
     }
 
@@ -400,7 +400,7 @@ export async function POST(req: NextRequest) {
         console.error("Post scrape error:", err);
       }
 
-      if (!titleOrAccount || titleOrAccount.toLowerCase().includes("log in")) titleOrAccount = `Instagram 动态 (${shortcode})`;
+      if (!titleOrAccount || titleOrAccount.toLowerCase().includes("log in")) titleOrAccount = `Instagram Post (${shortcode})`;
       followerCount = null; // Post MUST NOT have followers
     }
 
