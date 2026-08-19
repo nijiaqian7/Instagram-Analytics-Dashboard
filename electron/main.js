@@ -1,11 +1,9 @@
 const { app, BrowserWindow, Menu, dialog } = require('electron');
 const path = require('path');
 const http = require('http');
-const { spawn } = require('child_process');
 const net = require('net');
 
 let mainWindow = null;
-let serverProcess = null;
 
 // 获取可用随机端口
 function getFreePort() {
@@ -20,7 +18,7 @@ function getFreePort() {
 }
 
 // 轮询检查 Next.js 服务是否已就绪
-function waitForServer(port, timeoutMs = 25000) {
+function waitForServer(port, timeoutMs = 15000) {
   const startTime = Date.now();
   return new Promise((resolve, reject) => {
     const check = () => {
@@ -39,7 +37,7 @@ function waitForServer(port, timeoutMs = 25000) {
       if (Date.now() - startTime > timeoutMs) {
         reject(new Error('Server start timed out'));
       } else {
-        setTimeout(check, 300);
+        setTimeout(check, 100);
       }
     };
 
@@ -56,32 +54,29 @@ async function startNextServer(port) {
   }
 
   const serverPath = path.join(serverDir, 'server.js');
+  const standaloneNodeModules = path.join(serverDir, 'node_modules');
 
   console.log(`[Electron] Starting Next.js server at: ${serverPath} on port ${port}`);
 
-  serverProcess = spawn(process.execPath, [serverPath], {
-    cwd: serverDir,
-    env: {
-      ...process.env,
-      PORT: port.toString(),
-      HOSTNAME: '127.0.0.1',
-      NODE_ENV: 'production',
-      ELECTRON_RUN_AS_NODE: '1',
-    },
-    stdio: 'pipe',
-  });
+  // 注册依赖搜索路径，确保主进程能准确找到 standalone/node_modules 下的 next 等依赖
+  const Module = require('module');
+  if (!Module.globalPaths.includes(standaloneNodeModules)) {
+    Module.globalPaths.push(standaloneNodeModules);
+  }
+  process.env.NODE_PATH = standaloneNodeModules;
+  if (Module._initPaths) {
+    Module._initPaths();
+  }
 
-  serverProcess.stdout.on('data', (data) => {
-    console.log(`[Next.js Server]: ${data}`);
-  });
+  process.env.PORT = port.toString();
+  process.env.HOSTNAME = '127.0.0.1';
+  process.env.NODE_ENV = 'production';
 
-  serverProcess.stderr.on('data', (data) => {
-    console.error(`[Next.js Server Error]: ${data}`);
-  });
+  // 切换工作目录到 standalone，使 Next.js 能够正确解析静态资源与页面
+  process.chdir(serverDir);
 
-  serverProcess.on('exit', (code) => {
-    console.log(`[Next.js Server] Process exited with code ${code}`);
-  });
+  // 直接在主进程中加载 Next.js 独立服务端
+  require(serverPath);
 
   await waitForServer(port);
 }
@@ -138,25 +133,11 @@ if (!gotTheLock) {
       dialog.showErrorBox('程序启动异常', `后台服务启动失败: ${err.message || err}`);
       app.quit();
     }
-
-    app.on('activate', () => {
-      if (BrowserWindow.getAllWindows().length === 0) {
-        // 重建窗口
-      }
-    });
   });
 
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
       app.quit();
-    }
-  });
-
-  app.on('before-quit', () => {
-    if (serverProcess) {
-      console.log('[Electron] Killing background Next.js server...');
-      serverProcess.kill('SIGTERM');
-      serverProcess = null;
     }
   });
 }

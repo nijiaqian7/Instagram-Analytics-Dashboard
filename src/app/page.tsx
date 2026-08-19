@@ -129,7 +129,7 @@ const I18N = {
     excelColStatus: "状态",
     excelColUrl: "原始链接",
     excelColUpdated: "更新时间",
-    footerBrand: "SNS 运营数据看板 · 团队专属工具 (ZH / EN / KO)",
+    footerBrand: "SNS 运营数据看板 · 专属工具 (ZH / EN / KO)",
     invalidUrlDesc: "非支持的 SNS 链接 ({domain})",
     unknownDomain: "未知域名",
     unknownPlatform: "未知",
@@ -206,7 +206,7 @@ const I18N = {
     excelColStatus: "Status",
     excelColUrl: "URL",
     excelColUpdated: "Updated At",
-    footerBrand: "SNS Analytics Dashboard · Team Dedicated Tool (ZH / EN / KO)",
+    footerBrand: "SNS Analytics Dashboard · Dedicated Tool (ZH / EN / KO)",
     invalidUrlDesc: "Unsupported SNS Link ({domain})",
     unknownDomain: "Unknown Domain",
     unknownPlatform: "Unknown",
@@ -283,7 +283,7 @@ const I18N = {
     excelColStatus: "상태",
     excelColUrl: "URL 링크",
     excelColUpdated: "갱신 시간",
-    footerBrand: "SNS 데이터 대시보드 · 팀 전용 도구 (ZH / EN / KO)",
+    footerBrand: "SNS 데이터 대시보드 · 전용 프로그램 (ZH / EN / KO)",
     invalidUrlDesc: "지원하지 않는 SNS 링크 ({domain})",
     unknownDomain: "알 수 없는 도메인",
     unknownPlatform: "알 수 없음",
@@ -913,7 +913,6 @@ export default function DashboardPage() {
                   <th className="py-3.5 px-4">{t.colPlatform}</th>
                   <th className="py-3.5 px-4">{t.colType}</th>
                   <th className="py-3.5 px-4">{t.colAccount}</th>
-                  <th className="py-3.5 px-4 max-w-[220px]">{t.colDesc}</th>
                   <th className="py-3.5 px-4 text-right">
                     <span className="inline-flex items-center gap-1 justify-end">
                       <Heart className="w-3.5 h-3.5 text-rose-500" /> {t.colLikes}
@@ -932,7 +931,7 @@ export default function DashboardPage() {
               <tbody className="divide-y divide-slate-800/60">
                 {filteredData.length === 0 ? (
                   <tr>
-                    <td colSpan={10} className="py-12 text-center text-slate-500">
+                    <td colSpan={9} className="py-12 text-center text-slate-500">
                       <div className="flex flex-col items-center justify-center space-y-2">
                         <Share2 className="w-8 h-8 text-slate-700" />
                         <p>{t.emptyNotice}</p>
@@ -983,16 +982,6 @@ export default function DashboardPage() {
 
                       <td className="py-3.5 px-4 font-semibold text-slate-200 whitespace-nowrap max-w-[140px] truncate" title={item.identifier}>
                         {item.identifier}
-                      </td>
-
-                      {/* Description / Details Column with fixed max-width and tooltip on hover */}
-                      <td
-                        className="py-3.5 px-4 text-slate-300 max-w-[220px] whitespace-nowrap"
-                        title={item.status === "invalid_platform" ? t.invalidUrlDesc.replace("{domain}", item.identifier) : item.titleOrAccount}
-                      >
-                        <span className="block truncate cursor-default">
-                          {item.status === "invalid_platform" ? t.invalidUrlDesc.replace("{domain}", item.identifier) : item.titleOrAccount}
-                        </span>
                       </td>
 
                       {/* Likes Column (No Wrap) */}
@@ -1120,8 +1109,9 @@ export default function DashboardPage() {
         </section>
       </main>
 
-      <footer className="border-t border-slate-800 py-6 mt-12 text-center text-xs text-slate-600">
+      <footer className="border-t border-slate-800 py-6 mt-12 text-center text-xs text-slate-600 space-y-1">
         <p>{t.footerBrand}</p>
+        <p>from 예지원</p>
       </footer>
     </div>
   );
